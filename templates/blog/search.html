@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Search{% if query %}: {{ query }}{% endif %} — The Margin{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-label">Search</div>
+    <h1 class="page-title">{% if query %}"{{ query }}"{% else %}Find a post{% endif %}</h1>
+    <form class="search-form" action="{% url 'blog:search' %}" method="get" style="margin-top:1.5rem;max-width:400px">
+      <input type="text" name="q" value="{{ query }}" placeholder="Search posts…" autocomplete="off">
+      <button type="submit">Go</button>
+    </form>
+  </div>
+</div>
+<div class="layout">
+  <div>
+    {% if query %}
+      {% if posts %}
+      <p style="color:var(--muted);font-size:0.9rem;margin-bottom:2rem">{{ posts.paginator.count }} result{{ posts.paginator.count|pluralize }} found</p>
+      <div class="posts-grid">
+        {% for post in posts %}
+        <article class="post-card">
+          <div>
+            <div class="post-meta-top">
+              {% if post.category %}<a href="{{ post.category.get_absolute_url }}" class="post-category">{{ post.category.name }}</a><span>·</span>{% endif %}
+              <span class="post-date">{{ post.published_at|date:"N j, Y" }}</span>
+            </div>
+            <h2 class="post-title"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h2>
+            <p class="post-excerpt">{{ post.excerpt }}</p>
+            <div class="post-footer">
+              <a href="{{ post.get_absolute_url }}" class="read-more">Read →</a>
+            </div>
+          </div>
+          <div class="post-thumb-placeholder">✦</div>
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state"><h2>No results found</h2><p>Try different keywords.</p></div>
+      {% endif %}
+    {% else %}
+    <div class="empty-state"><h2>Enter a search term above</h2></div>
+    {% endif %}
+  </div>
+  <aside class="sidebar"></aside>
+</div>
+{% endblock %}

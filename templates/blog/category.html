@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}{{ category.name }} — The Margin{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-label">Category</div>
+    <h1 class="page-title">{{ category.name }}</h1>
+    {% if category.description %}<p style="color:var(--muted);margin-top:0.5rem">{{ category.description }}</p>{% endif %}
+  </div>
+</div>
+<div class="layout">
+  <div>
+    {% if posts %}
+    <div class="posts-grid">
+      {% for post in posts %}
+      <article class="post-card">
+        <div>
+          <div class="post-meta-top">
+            <span class="post-date">{{ post.published_at|date:"N j, Y" }}</span>
+          </div>
+          <h2 class="post-title"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h2>
+          <p class="post-excerpt">{{ post.excerpt }}</p>
+          <div class="post-footer">
+            <span class="post-author">By {{ post.author.get_full_name|default:post.author.username }}</span>
+            <a href="{{ post.get_absolute_url }}" class="read-more">Read →</a>
+          </div>
+        </div>
+        <div class="post-thumb-placeholder">✦</div>
+      </article>
+      {% endfor %}
+    </div>
+    {% if posts.has_other_pages %}
+    <div class="pagination">
+      {% if posts.has_previous %}<a href="?page={{ posts.previous_page_number }}">← Prev</a>{% endif %}
+      <span class="current">{{ posts.number }} / {{ posts.paginator.num_pages }}</span>
+      {% if posts.has_next %}<a href="?page={{ posts.next_page_number }}">Next →</a>{% endif %}
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="empty-state"><h2>No posts in this category yet.</h2></div>
+    {% endif %}
+  </div>
+  <aside class="sidebar"></aside>
+</div>
+{% endblock %}

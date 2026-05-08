@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}{{ post.title }} — The Margin{% endblock %}
+{% block content %}
+<div class="post-detail-wrap">
+  <main>
+    <article>
+      <header class="article-header">
+        <div class="article-meta">
+          {% if post.category %}
+          <a href="{{ post.category.get_absolute_url }}" class="post-category">{{ post.category.name }}</a>
+          <span>·</span>
+          {% endif %}
+          <span>{{ post.published_at|date:"F j, Y" }}</span>
+          <span>·</span>
+          <span>By {{ post.author.get_full_name|default:post.author.username }}</span>
+          <span>·</span>
+          <span class="post-views">{{ post.views }} views</span>
+        </div>
+        <h1 class="article-title">{{ post.title }}</h1>
+        {% if post.excerpt %}
+        <p class="article-excerpt">{{ post.excerpt }}</p>
+        {% endif %}
+      </header>
+
+      {% if post.cover_image %}
+      <img src="{{ post.cover_image.url }}" alt="{{ post.title }}" class="article-cover">
+      {% endif %}
+
+      <div class="article-body">{{ post.body|linebreaks }}</div>
+
+      {% if post.tags.all %}
+      <div class="article-tags">
+        {% for tag in post.tags.all %}
+        <a href="{% url 'blog:tag' tag.slug %}" class="tag">#{{ tag.name }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </article>
+
+    {% if related_posts %}
+    <div class="related-posts">
+      <div class="section-title">More to read</div>
+      <div class="related-grid">
+        {% for rp in related_posts %}
+        <div class="related-card">
+          <a href="{{ rp.get_absolute_url }}">
+            {% if rp.category %}<div class="related-category">{{ rp.category.name }}</div>{% endif %}
+            <div class="related-title">{{ rp.title }}</div>
+            <div class="related-date">{{ rp.published_at|date:"N j, Y" }}</div>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="comments-section">
+      <div class="section-title">{{ comments.count }} Comment{{ comments.count|pluralize }}</div>
+      {% for comment in comments %}
+      <div class="comment-item">
+        <div class="comment-meta">
+          <span class="comment-author">{{ comment.name }}</span>
+          <span class="comment-date">{{ comment.created_at|date:"N j, Y" }}</span>
+        </div>
+        <p class="comment-body">{{ comment.body }}</p>
+      </div>
+      {% empty %}
+      <p style="color:var(--muted);font-size:0.9rem">No comments yet. Be the first!</p>
+      {% endfor %}
+
+      <div class="comment-form">
+        <div class="section-title" style="font-size:1.2rem">Leave a comment</div>
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" id="name" name="name" required placeholder="Your name">
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" required placeholder="your@email.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="body">Comment</label>
+            <textarea id="body" name="body" rows="5" required placeholder="Write your comment…"></textarea>
+          </div>
+          <button type="submit" class="btn">Post Comment</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <aside class="article-sidebar">
+    <div class="sticky-sidebar">
+      <div class="sidebar-widget">
+        <div class="widget-title">About the Author</div>
+        <p style="font-size:0.9rem;color:var(--muted)">{{ post.author.get_full_name|default:post.author.username }}</p>
+      </div>
+    </div>
+  </aside>
+</div>
+{% endblock %}

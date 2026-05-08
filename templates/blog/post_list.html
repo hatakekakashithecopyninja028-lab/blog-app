@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}The Margin — A Blog{% endblock %}
+{% block content %}
+<div class="hero">
+  <div class="hero-label">Est. 2024 · Ideas & Writing</div>
+  <h1>A space for long-form thinking</h1>
+  <p>Essays, notes, and explorations on technology, culture, and everything in between.</p>
+  <div class="search-bar">
+    <form class="search-form" action="{% url 'blog:search' %}" method="get">
+      <input type="text" name="q" placeholder="Search posts…" autocomplete="off">
+      <button type="submit">Search</button>
+    </form>
+  </div>
+</div>
+
+<div class="layout">
+  <div>
+    {% if posts %}
+    <div class="posts-grid">
+      {% for post in posts %}
+      <article class="post-card">
+        <div>
+          <div class="post-meta-top">
+            {% if post.category %}
+            <a href="{{ post.category.get_absolute_url }}" class="post-category">{{ post.category.name }}</a>
+            <span class="post-date">·</span>
+            {% endif %}
+            <span class="post-date">{{ post.published_at|date:"N j, Y" }}</span>
+          </div>
+          <h2 class="post-title">
+            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+          </h2>
+          <p class="post-excerpt">{{ post.excerpt }}</p>
+          <div class="post-footer">
+            <span class="post-author">By {{ post.author.get_full_name|default:post.author.username }}</span>
+            <span class="post-views">{{ post.views }} views</span>
+            <a href="{{ post.get_absolute_url }}" class="read-more">Read →</a>
+          </div>
+        </div>
+        {% if post.cover_image %}
+        <img src="{{ post.cover_image.url }}" alt="{{ post.title }}" class="post-thumb">
+        {% else %}
+        <div class="post-thumb-placeholder">✦</div>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+
+    {% if posts.has_other_pages %}
+    <div class="pagination">
+      {% if posts.has_previous %}
+      <a href="?page={{ posts.previous_page_number }}">← Prev</a>
+      {% endif %}
+      <span class="current">{{ posts.number }} / {{ posts.paginator.num_pages }}</span>
+      {% if posts.has_next %}
+      <a href="?page={{ posts.next_page_number }}">Next →</a>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="empty-state">
+      <h2>Nothing here yet</h2>
+      <p>Check back soon — or add posts through the <a href="/admin/" style="color:var(--rust)">admin panel</a>.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <aside class="sidebar">
+    {% if categories %}
+    <div class="sidebar-widget">
+      <div class="widget-title">Categories</div>
+      <ul class="category-list">
+        {% for cat in categories %}
+        <li><a href="{{ cat.get_absolute_url }}">{{ cat.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    {% if tags %}
+    <div class="sidebar-widget">
+      <div class="widget-title">Tags</div>
+      <div class="tag-cloud">
+        {% for tag in tags %}
+        <a href="{% url 'blog:tag' tag.slug %}" class="tag">#{{ tag.name }}</a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}
